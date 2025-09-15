@@ -1,0 +1,3 @@
+[UE -> NAS] Attach Request 
+[UE <- NAS] Attach Accept 
+[UE -> NAS] Attach Complete 

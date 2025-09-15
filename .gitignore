@@ -1,0 +1,9 @@
+build/
+test/
+.vscode/
+*.log
+*.pcap
+.ctxt
+*.csv
+*.json
+*.zip

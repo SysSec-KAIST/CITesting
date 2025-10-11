@@ -77,7 +77,9 @@ def readLog(log_path, cur_depth, mode):
                   break
             else:
                depth_counter += 1
-      
+      if "Reject" in lines[line_of_response_message] or "no longer connected" in lines[line_of_response_message] or "No response" in lines[line_of_response_message]:
+         return 
+
       if mode == "cur_depth":
          gen_cur_depth_adaptive_config(log_path, cur_depth, lines[line_of_response_message])
       elif mode == "next_depth":
@@ -87,7 +89,8 @@ def gen_next_state_config(log_filename, depth, response_message): # New Version
    cwd = os.path.dirname(os.path.realpath(__file__))
    match = re.search(r'depth(\d)+_(\d+_\d+)\.log', log_filename)
    if match:
-      test_num = int(match.group(1))+1
+      test_num = int(match.group(1))
+      print("test_num: ", test_num)
       file_index = match.group(2)
       front_index = file_index.split('_')[0]
    
@@ -113,14 +116,15 @@ def gen_next_state_config(log_filename, depth, response_message): # New Version
                   response_message = line.split('[UE <- NAS] ')[1]
                   break
       pair = (test_message, response_message)
+      print(pair)
       if pair not in pair_message[int(front_index)]:
          source_config = f'./data/{core}/test_list/{core}_depth{depth}_{state}_{initial_message_type}/depth{depth}_{file_index}.conf'
          destination_config = f'./data/{core}/test_list/{core}_depth{depth}_{state}_{initial_message_type}_merged/depth{depth}_{sum(len(s) for s in pair_message)}.conf'
          shutil.copy2(source_config, destination_config)
          config_test_list_parser = configparser.ConfigParser()
-         config_test_list_parser[sum(len(s) for s in pair_message)] = {} #remove first 'underscore'
-         config_test_list_parser[sum(len(s) for s in pair_message)]['test_file'] = cwd + f"/data/{core}/test_list/{core}_depth{depth}_{state}_{initial_message_type}_merged/depth{depth}_{sum(len(s) for s in pair_message)}.conf"
-         config_test_list_parser[sum(len(s) for s in pair_message)]['logfile'] =  cwd + f"/data/{core}/log/{core}_depth{depth}_{state}_{initial_message_type}_merged/depth{depth}_{sum(len(s) for s in pair_message)}.log"
+         config_test_list_parser[str(sum(len(s) for s in pair_message))] = {} #remove first 'underscore'
+         config_test_list_parser[str(sum(len(s) for s in pair_message))]['test_file'] = cwd + f"/data/{core}/test_list/{core}_depth{depth}_{state}_{initial_message_type}_merged/depth{depth}_{sum(len(s) for s in pair_message)}.conf"
+         config_test_list_parser[str(sum(len(s) for s in pair_message))]['logfile'] =  cwd + f"/data/{core}/log/{core}_depth{depth}_{state}_{initial_message_type}_merged/depth{depth}_{sum(len(s) for s in pair_message)}.log"
          with open(f'./data/{core}/config/{core}_depth{depth}_{state}_{initial_message_type}_merged/test_list_depth{depth}.conf', 'a') as testconfFile: #write new test list for next depth
             config_test_list_parser.write(testconfFile)
          pair_message[int(front_index)].add((test_message, response_message))
@@ -248,14 +252,14 @@ if __name__ == "__main__":
       testing_message_num = file.count("_") # if file is testing procedure, this value is 2
       full_path = os.path.join(file_path, file)
       
-      ret_code = compare_from_verfication_log(full_path, cur_log_depth + (testing_message_num-1)) # If testing procedure, add one to depth number
+      ret_code = compare_from_verfication_log(full_path, cur_log_depth) # If testing procedure, add one to depth number
       if ret_code == "Abnormal":
-         readLog(full_path, cur_log_depth + (testing_message_num-1), args.mode)
+         readLog(full_path, cur_log_depth, args.mode)
          abnormal += 1
          if CIV_category:
             shutil.copy(full_path, abnormal_dir)
       elif ret_code == "Normal":
-         readLog(full_path, cur_log_depth + (testing_message_num-1), args.mode)
+         readLog(full_path, cur_log_depth, args.mode)
          normal += 1
          if CIV_category:
             shutil.copy(full_path, normal_dir)

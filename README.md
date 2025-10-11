@@ -8,12 +8,12 @@ CITesting adopts a **dual-UE architecture**, with a victim UE controlled across 
 
 CIV detection is guided by a **behavioral oracle**: after each exploration sequence, the victim UE performs state-specific service attempts, and deviations from expected responses are flagged as context modifications.  
 
-For more details, please refer to our paper.
+For more details, please refer to our [paper](https://syssec.kaist.ac.kr/pub/2025/CITesting.pdf).
 
 Prerequisites
 =======
 - **Operating System**: Ubuntu 20.04 LTS
-- **Hardware**: Two USRPs (B200 or B210)
+- **Hardware**: Two (B200 or B210) USRPs (If you use the open source testbed, you will need one additional USRP to build the base station.)
 - **Dependencies**: srsRAN, UHD Driver, Python 3.8+
 - **SIM Card (optional)**: A programmable SIM card (e.g., SysmoISIM-SJA2) that enables the LTE radio connection and allows the victim UE to attach to the test core network
 
